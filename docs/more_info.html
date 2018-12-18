@@ -218,7 +218,7 @@ $(document).ready(function ()  {
 
     // establish options
     var options = {
-      selectors: "h1,h2",
+      selectors: "h1,h2,h3,h4,h5",
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
@@ -353,19 +353,15 @@ div.tocify {
 <!--
 Comments in HTML are like this! 
 -->
-<p>Problem Statement: (to-do) Are food outbreaks on the rise? What factors contribute to this change?</p>
+<div id="more-information" class="section level1">
+<h1>More Information</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="kw">library</span>(readr)
-<span class="co"># library(USAboundaries)</span>
-<span class="co"># library(sf)</span>
-<span class="co"># library(leaflet)</span>
 
 food_outbreaks &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;outbreaks.csv&quot;</span>)
+
 food_outbreaks &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span>
-<span class="st">  </span>
-<span class="co">#filter for the 12 Midwest states we are interested in</span>
-<span class="kw">filter</span>(State <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Illinois&quot;</span>,<span class="st">&quot;Indiana&quot;</span>,<span class="st">&quot;Iowa&quot;</span>,<span class="st">&quot;Kansas&quot;</span>,<span class="st">&quot;Michigan&quot;</span>,
-                  <span class="st">&quot;Minnesota&quot;</span>,<span class="st">&quot;Missouri&quot;</span>,<span class="st">&quot;Nebraska&quot;</span>,<span class="st">&quot;North Dakota&quot;</span>,<span class="st">&quot;Ohio&quot;</span>,<span class="st">&quot;South Dakota&quot;</span>,<span class="st">&quot;Wisconsin&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="kw">filter</span>(State <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Illinois&quot;</span>, <span class="st">&quot;Indiana&quot;</span>, <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Michigan&quot;</span>, <span class="st">&quot;Minnesota&quot;</span>,<span class="st">&quot;Missouri&quot;</span>,<span class="st">&quot;Nebraska&quot;</span>,<span class="st">&quot;North Dakota&quot;</span>,<span class="st">&quot;Ohio&quot;</span>,<span class="st">&quot;South Dakota&quot;</span>,<span class="st">&quot;Wisconsin&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span>
 <span class="co">#select only information we are interested in </span>
 <span class="kw">select</span>(State, Year, Month, Status, Illnesses, Hospitalizations, 
@@ -377,22 +373,25 @@ Fatalities, Species ) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="co">#replace all the n/a entries with a value of 0 </span>
 food_outbreaks[<span class="kw">is.na</span>(food_outbreaks)] &lt;-<span class="st"> </span><span class="dv">0</span>
 
-<span class="co">#tidy food_outbreaks</span>
-food_outbreaks_tidy &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">group_by</span>(State, Year, Illnesses, Hospitalizations, Fatalities) <span class="op">%&gt;%</span>
+<span class="co"># food_ outbreaks_tidy </span>
+food_outbreaks_tidy &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(State, Year, Illnesses, Hospitalizations, Fatalities)<span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Total =</span> Illnesses <span class="op">+</span><span class="st"> </span>Hospitalizations <span class="op">+</span><span class="st"> </span>Fatalities) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">gather</span>(Effect, Cases, <span class="kw">c</span>(<span class="st">&quot;Illnesses&quot;</span>, <span class="st">&quot;Hospitalizations&quot;</span>, <span class="st">&quot;Fatalities&quot;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">gather</span>(Effect, Cases, <span class="kw">c</span>(<span class="st">&quot;Illnesses&quot;</span>, <span class="st">&quot;Hospitalizations&quot;</span>, <span class="st">&quot;Fatalities&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">select</span>(State, Year, Species, Effect, Cases, Total)
 
-<span class="co">#scatterplot food_outbreaks_tidy</span>
-<span class="kw">ggplot</span>(<span class="dt">data =</span> food_outbreaks_tidy,
-      <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Year, <span class="dt">y =</span> Cases, <span class="dt">color =</span> State)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">shape =</span> <span class="dv">1</span>)  <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>Effect) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="dv">1</span>, <span class="dt">height =</span> <span class="dv">1</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Food Outbreak Severity in the Midwest Over Time&quot;</span>, <span class="dt">x =</span><span class="st">&quot;Years&quot;</span>, <span class="dt">y=</span> <span class="st">&quot;Affected Indivduals&quot;</span>)</code></pre></div>
-<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="960" /> Write your blog post here (intro, no more than 300 words) (to-do)</p>
+<span class="co">#histogram by Species </span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> food_outbreaks_tidy, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Year)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth =</span> <span class="fl">1.5</span>, <span class="dt">fill =</span> <span class="st">&quot;cadetblue3&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>Species, <span class="dt">nrow =</span> <span class="dv">7</span>) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Number of Individuals Affected&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Outbreaks by Species/Agent&quot;</span>)</code></pre></div>
+<p><img src="more_info_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#to-do: 3rd visualization</span>
+<span class="co">#to-do: use group_by </span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#line graph of outbreaks over time by State </span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> food_outbreaks_tidy, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Year, <span class="dt">y =</span> Total)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_wrap</span>(<span class="op">~</span>State, <span class="dt">nrow =</span> <span class="dv">3</span>) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="dt">y=</span><span class="st">&quot;Number of Individuals Affected&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Outbreak Trends in Midwest Over Time&quot;</span>, <span class="dt">subtitle =</span> <span class="st">&quot;State by State from 1998-2015&quot;</span>)</code></pre></div>
+<p><img src="more_info_files/figure-html/unnamed-chunk-2-1.png" width="960" /> ``` More explanation (no more than 800 words)</p>
+</div>
 
 
 
