@@ -12,7 +12,7 @@
 <meta name="author" content="K. Munyenyembe, M. Mick and E. Sui" />
 
 
-<title>How safe is your food? Food Safety in the Midwest from 1998 to 2015</title>
+<title>How safe is your food? Food Outbreaks in the Midwest from 1998 to 2015</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -313,7 +313,7 @@ div.tocify {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">Food Safety in the Midwest</a>
+      <a class="navbar-brand" href="index.html">Food Outbreaks in the Midwest</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -343,9 +343,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">How safe is your food? Food Safety in the Midwest from 1998 to 2015</h1>
+<h1 class="title toc-ignore">How safe is your food? Food Outbreaks in the Midwest from 1998 to 2015</h1>
 <h4 class="author"><em>K. Munyenyembe, M. Mick and E. Sui</em></h4>
-<h4 class="date"><em>Last updated on 2018-12-18</em></h4>
+<h4 class="date"><em>Last updated on 2018-12-19</em></h4>
 
 </div>
 
@@ -356,42 +356,32 @@ Comments in HTML are like this!
 <p>Problem Statement: (to-do) Are food outbreaks on the rise? What factors contribute to this change?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="kw">library</span>(readr)
-<span class="co"># library(USAboundaries)</span>
-<span class="co"># library(sf)</span>
-<span class="co"># library(leaflet)</span>
 
 food_outbreaks &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;outbreaks.csv&quot;</span>)
 food_outbreaks &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span>
-<span class="st">  </span>
 <span class="co">#filter for the 12 Midwest states we are interested in</span>
-<span class="kw">filter</span>(State <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Illinois&quot;</span>,<span class="st">&quot;Indiana&quot;</span>,<span class="st">&quot;Iowa&quot;</span>,<span class="st">&quot;Kansas&quot;</span>,<span class="st">&quot;Michigan&quot;</span>,
-                  <span class="st">&quot;Minnesota&quot;</span>,<span class="st">&quot;Missouri&quot;</span>,<span class="st">&quot;Nebraska&quot;</span>,<span class="st">&quot;North Dakota&quot;</span>,<span class="st">&quot;Ohio&quot;</span>,<span class="st">&quot;South Dakota&quot;</span>,<span class="st">&quot;Wisconsin&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span>
+<span class="kw">filter</span>(State <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Illinois&quot;</span>,<span class="st">&quot;Indiana&quot;</span>,<span class="st">&quot;Iowa&quot;</span>,<span class="st">&quot;Kansas&quot;</span>,<span class="st">&quot;Michigan&quot;</span>,<span class="st">&quot;Minnesota&quot;</span>,<span class="st">&quot;Missouri&quot;</span>,<span class="st">&quot;Nebraska&quot;</span>,<span class="st">&quot;North Dakota&quot;</span>,<span class="st">&quot;Ohio&quot;</span>,<span class="st">&quot;South Dakota&quot;</span>,<span class="st">&quot;Wisconsin&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="co">#select only information we are interested in </span>
 <span class="kw">select</span>(State, Year, Month, Status, Illnesses, Hospitalizations, 
 Fatalities, Species ) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span>
 <span class="co">#filter for incidents with confirmed status </span>
 <span class="kw">filter</span>(Status <span class="op">==</span><span class="st"> &quot;Confirmed&quot;</span>)
-
 <span class="co">#replace all the n/a entries with a value of 0 </span>
 food_outbreaks[<span class="kw">is.na</span>(food_outbreaks)] &lt;-<span class="st"> </span><span class="dv">0</span>
 
-<span class="co">#tidy food_outbreaks</span>
-food_outbreaks_tidy &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">group_by</span>(State, Year, Illnesses, Hospitalizations, Fatalities) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Total =</span> Illnesses <span class="op">+</span><span class="st"> </span>Hospitalizations <span class="op">+</span><span class="st"> </span>Fatalities) <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">gather</span>(Effect, Cases, <span class="kw">c</span>(<span class="st">&quot;Illnesses&quot;</span>, <span class="st">&quot;Hospitalizations&quot;</span>, <span class="st">&quot;Fatalities&quot;</span>)) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">select</span>(State, Year, Species, Effect, Cases, Total)
+<span class="co">#summarize outbreaks_tidy &lt;- outbreaks %&gt;%</span>
+food_outbreaks_tidy &lt;-<span class="st"> </span>food_outbreaks <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">gather</span>(Effect, Total, <span class="kw">c</span>(<span class="st">&quot;Illnesses&quot;</span>, <span class="st">&quot;Hospitalizations&quot;</span>, <span class="st">&quot;Fatalities&quot;</span>)) 
 
 <span class="co">#scatterplot food_outbreaks_tidy</span>
 <span class="kw">ggplot</span>(<span class="dt">data =</span> food_outbreaks_tidy,
-      <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Year, <span class="dt">y =</span> Cases, <span class="dt">color =</span> State)) <span class="op">+</span>
+      <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> Year, <span class="dt">y =</span> Total, <span class="dt">color =</span> State)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">shape =</span> <span class="dv">1</span>)  <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>Effect) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Food Outbreak Severity in the Midwest Over Time&quot;</span>, <span class="dt">x =</span><span class="st">&quot;Years&quot;</span>, <span class="dt">y=</span> <span class="st">&quot;Affected Indivduals&quot;</span>)</code></pre></div>
-<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="960" /> Write your blog post here (intro, no more than 300 words) (to-do)</p>
+<span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="dv">1</span>, <span class="dt">height =</span> <span class="dv">1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>)</code></pre></div>
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="960" /> Food contamination is a serious problem that many in the United States are concerned about but have little information on. In recent years, we have seen stories of both chemical and microbial food contaminations in the media and government notices. However, the question still remains whether food contaminations are increasing or decreasing. Have foodborne outbreaks changed over time and what types of consequences (illnesses, hospitalizations, or fatalities) have these problems led? In our project, we address these questions by examining foodborne outbreaks between 1998 and 2015 in the United States using information provided by the Center of Diseases and Control (CDC). We focus on the twelve Midwest States so that we could compare states with a geographic proximity and similar population size. Furthermore,the level of food safety regulations differs in each state, allowing an examination of food safety variance by state.</p>
+<p>In this scatterplot, we visualize the number of individuals affected by confirmed foodborne illnesses between 1998 and 2015. The numbers of fatalities and hospitalization remain fairly low and similar in the Midwest as a whole (there was only one fatality that was confirmed case food poisoning). There is, however, greater variance in the number of illnesses.</p>
 
 
 
